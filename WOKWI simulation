@@ -1,1 +1,77 @@
 
+{"version":1,"author":"NAKABUUBI JESSICA","editor":"wokwi","parts":[{"type":"board-mfrc522","id":"rfid1","top":-21.85,"left":-255.76,"rotate":0,"hide":false,"attrs":{}}],"connections":[],"dependencies":{}}
+https://WOKWI.com/projects/464087870943460353
+
+
+#include <SPI.h>
+#include <MFRC522.h>
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+
+#define SS_PIN 10
+#define RST_PIN 9
+
+#define GREEN_LED 7
+#define RED_LED 6
+#define BUZZER 8
+
+MFRC522 rfid(SS_PIN, RST_PIN);
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+// Authorized RFID UID
+String authorizedUID = "93 A7 16 2C";
+
+void setup() {
+
+  Serial.begin(9600);
+
+  SPI.begin();
+  rfid.PCD_Init();
+
+  lcd.init();
+  lcd.backlight();
+
+  pinMode(GREEN_LED, OUTPUT);
+  pinMode(RED_LED, OUTPUT);
+  pinMode(BUZZER, OUTPUT);
+
+  lcd.setCursor(0, 0);
+  lcd.print("Smart Attendance");
+  lcd.setCursor(0, 1);
+  lcd.print("Scan Your Card");
+
+  Serial.println("System Ready");
+}
+
+void loop() {
+
+  // Wait for RFID card
+  if (!rfid.PICC_IsNewCardPresent()) {
+    return;
+  }
+
+  if (!rfid.PICC_ReadCardSerial()) {
+    return;
+  }
+
+  String cardUID = "";
+
+  // Read UID
+  for (byte i = 0; i < rfid.uid.size; i++) {
+    cardUID += String(rfid.uid.uidByte[i] < 0x10 ? " 0" : " ");
+    cardUID += String(rfid.uid.uidByte[i], HEX);
+  }
+
+  cardUID.toUpperCase();
+
+  Serial.print("Card UID:");
+  Serial.println(cardUID);
+
+  // Authorized Card
+  if (cardUID.substring(1) == authorizedUID) {
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Welcome Jessica");
+
+    lcd.setCursor
