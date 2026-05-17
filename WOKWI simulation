@@ -68,10 +68,40 @@ void loop() {
   Serial.println(cardUID);
 
   // Authorized Card
-  if (cardUID.substring(1) == authorizedUID) {
+  if (cardUID == authorizedUID) {
 
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Welcome Jessica");
 
     lcd.setCursor
+    lcd.print("Attendance OK");
+    digitalWrite(RED_lED, LOW);
+    digitalWrite(GREEN_LED, HIGH);
+    tone(BUZZER, 1000);
+    Serial.println("Jessica Present");
+    delay(2000);
+
+    digitalWrite(GREEN_lED, LOW);
+    noTone(BUZZER);
+ }
+ else{
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("Access Denied");
+    digitalWrite(RED_LED, HIGH);
+
+    tone(BUZZER, 500);
+    Serial.println("Unauthorised Access");
+    delay(2000);
+    digitalWrite(GREEN_LED,LOW);
+    digitalWrite(RED_LED, HIGH); //Turn RED OFF after delay
+
+    noTone(BUZZER);
+}
+//reset the screen back to the standard idle state
+lcd.clear();
+lcd.setCursor(0,0);
+lcd.print("Scan Your Card");
+rfid.PICC_HaltA();
+}
